@@ -19,7 +19,7 @@ public class BookingController {
 
     // ------- book a class using user's package -----------
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
-    @PostMapping("/{userId}/{classScheduleId}")
+    @PostMapping("book/{userId}/{classScheduleId}")
     public ResponseEntity<?> bookClass(@PathVariable Long userId, @PathVariable Long classScheduleId) {
         try {
             String bookingStatus = bookingService.bookClass(userId, classScheduleId);
@@ -31,8 +31,8 @@ public class BookingController {
     }
 
     // ---------- cancel a booking -----------------
-    @PreAuthorize("hasAnyAuthority('SCOPE_DELETE')")
-    @DeleteMapping("/{bookingId}")
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
+    @PostMapping("cancel/{bookingId}")
     public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) {
         try {
             bookingService.cancelBooking(bookingId);

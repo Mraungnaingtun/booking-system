@@ -19,6 +19,7 @@ import com.logant.BookingSystem.Repository.WaitlistRepository;
 
 import jakarta.transaction.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -118,22 +119,29 @@ public class BookingService {
                 Booking booking = bookingRepository.findById(bookingId)
                                 .orElseThrow(() -> new Exception("Booking not found"));
 
-                // Refund credits to the user's package
-                Country classCountry = booking.getClassSchedule().getCountry();
-                UserPackage userPackage = userPackageRepository.findByUserIdAndPkg_Country(
-                                booking.getUser().getId(),
-                                classCountry).orElseThrow(() -> new Exception("Package not found for user"));
+                ClassSchedule classSchedule = booking.getClassSchedule();
+                LocalDateTime classStartTime = classSchedule.getStartTime();
+                LocalDateTime currentTime = LocalDateTime.now();
 
-                userPackage.setCredits(userPackage.getCredits() + booking.getCreditsUsed());
-                userPackageRepository.save(userPackage);
+                // Check if cancellation is within 4 hours of class start time
+                long hoursUntilClass = Duration.between(currentTime, classStartTime).toHours();
+
+                if (hoursUntilClass >= 4) {
+                        // Refund credits to the user's package
+                        Country classCountry = classSchedule.getCountry();
+                        UserPackage userPackage = userPackageRepository.findByUserIdAndPkg_Country(
+                                        booking.getUser().getId(),
+                                        classCountry).orElseThrow(() -> new Exception("Package not found for user"));
+
+                        userPackage.setCredits(userPackage.getCredits() + booking.getCreditsUsed());
+                        userPackageRepository.save(userPackage);
+                }
 
                 // Revert available slots for the class
-                ClassSchedule classSchedule = booking.getClassSchedule();
                 classSchedule.setAvailableSlots(classSchedule.getAvailableSlots() + 1);
 
                 // Check if there are any users in the waitlist for this class
                 Waitlist waitlistUser = waitlistRepository.findFirstByClassScheduleOrderByPositionAsc(classSchedule);
-
                 if (waitlistUser != null) {
                         // Book the first waitlist user for the class
                         User waitlistedUser = waitlistUser.getUser();
@@ -161,7 +169,7 @@ public class BookingService {
 
                 // Update the original booking status to cancelled
                 booking.setStatus(BookingStatus.CANCELLED);
-                booking.setCancellationDate(LocalDateTime.now());
+                booking.setCancellationDate(currentTime);
                 bookingRepository.save(booking);
         }
 
@@ -177,7 +185,7 @@ public class BookingService {
 
         @Transactional
         public void refundCreditsToWaitlistUser(Waitlist waitlistUser, ClassSchedule endedClass) throws Exception {
-                
+
                 User user = waitlistUser.getUser();
                 UserPackage userPackage = userPackageRepository
                                 .findByUserIdAndPkg_Country(user.getId(), endedClass.getCountry())
@@ -186,8 +194,8 @@ public class BookingService {
                 int creditsToRefund = endedClass.getRequiredCredits();
                 userPackage.setCredits(userPackage.getCredits() + creditsToRefund);
                 userPackageRepository.save(userPackage);
-                
-                //finally delete user from wait list
+
+                // finally delete user from wait list
                 waitlistRepository.delete(waitlistUser);
         }
 }
