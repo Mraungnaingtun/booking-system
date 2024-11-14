@@ -1,4 +1,4 @@
-package com.logant.BookingSystem.Security.mapper;
+package com.logant.BookingSystem.Security.UserDetails;
 
 import com.logant.BookingSystem.Dto.UserRegistrationDto;
 import com.logant.BookingSystem.Entity.User;
@@ -22,15 +22,6 @@ public class UserInfoMapper {
         userInfoEntity.setPassword(passwordEncoder.encode(userRegistrationDto.userPassword()));
         return userInfoEntity;
     }
-
-    // public boolean checkPassword(String oldPassword, String presentPassword) {
-    //     System.out.println("old " + presentPassword);
-    //     System.out.println("encoded" + passwordEncoder.encode(oldPassword));
-    //     if (presentPassword.equals(passwordEncoder.encode(oldPassword))) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);

@@ -5,11 +5,17 @@ spring:
     ansi:
       enabled: ALWAYS
   datasource:
-    url: jdbc:postgresql://localhost:5432/Booking
+    url: jdbc:postgresql://localhost:5432/BookingSystem
     username: postgres
     password: 1qaz!QAZ
     driver-class-name: org.postgresql.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000
+    
   jpa:
     show-sql: true
     hibernate:
@@ -23,6 +29,7 @@ jwt:
   rsa-public-key: classpath:certs/publicKey.pem
   access-token:
     expiration: 60
+
 
 
 # logging:

@@ -1,4 +1,4 @@
-package com.logant.BookingSystem.Quartz;
+package com.logant.BookingSystem.Service;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.logant.BookingSystem.Entity.ClassSchedule;
 import com.logant.BookingSystem.Entity.Waitlist;
-import com.logant.BookingSystem.Service.BookingService;
 
 import lombok.extern.slf4j.Slf4j;
 

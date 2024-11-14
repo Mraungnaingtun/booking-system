@@ -1,7 +1,7 @@
-package com.logant.BookingSystem.Security.config.jwtAuth;
+package com.logant.BookingSystem.Security.Jwt;
 
 import com.logant.BookingSystem.Repository.UserRepository;
-import com.logant.BookingSystem.Security.config.user.MyUserDetails;
+import com.logant.BookingSystem.Security.UserDetails.MyUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

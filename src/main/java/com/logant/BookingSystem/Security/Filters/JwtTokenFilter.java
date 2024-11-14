@@ -1,8 +1,8 @@
 package com.logant.BookingSystem.Security.Filters;
 
-import com.logant.BookingSystem.Security.Enum.TokenType;
-import com.logant.BookingSystem.Security.config.RSAKeyRecord;
-import com.logant.BookingSystem.Security.config.jwtAuth.JwtTokenUtils;
+import com.logant.BookingSystem.Enum.TokenType;
+import com.logant.BookingSystem.Security.Jwt.JwtTokenUtils;
+import com.logant.BookingSystem.config.RSAKeyRecord;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +27,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Slf4j
-public class JwtAccessTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final RSAKeyRecord rsaKeyRecord;
     private final JwtTokenUtils jwtTokenUtils;

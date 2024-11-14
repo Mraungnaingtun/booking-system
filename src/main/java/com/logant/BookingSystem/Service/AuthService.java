@@ -6,8 +6,9 @@ import com.logant.BookingSystem.Dto.ResetPasswordDto;
 import com.logant.BookingSystem.Dto.UserRegistrationDto;
 import com.logant.BookingSystem.Entity.User;
 import com.logant.BookingSystem.Repository.UserRepository;
-import com.logant.BookingSystem.Security.mapper.UserInfoMapper;
-import com.logant.BookingSystem.Security.config.jwtAuth.JwtTokenGenerator;
+import com.logant.BookingSystem.Security.Jwt.JwtTokenGenerator;
+import com.logant.BookingSystem.Security.UserDetails.UserInfoMapper;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

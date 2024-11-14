@@ -1,4 +1,4 @@
-package com.logant.BookingSystem.Security.config.jwtAuth;
+package com.logant.BookingSystem.Security.Jwt;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

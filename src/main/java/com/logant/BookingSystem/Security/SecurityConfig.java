@@ -1,9 +1,9 @@
 package com.logant.BookingSystem.Security;
 
-import com.logant.BookingSystem.Security.Filters.JwtAccessTokenFilter;
-import com.logant.BookingSystem.Security.config.RSAKeyRecord;
-import com.logant.BookingSystem.Security.config.jwtAuth.JwtTokenUtils;
-import com.logant.BookingSystem.Security.config.user.MyUserDetailsService;
+import com.logant.BookingSystem.Security.Filters.JwtTokenFilter;
+import com.logant.BookingSystem.Security.Jwt.JwtTokenUtils;
+import com.logant.BookingSystem.Security.UserDetails.MyUserDetailsService;
+import com.logant.BookingSystem.config.RSAKeyRecord;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtAccessTokenFilter(rsaKeyRecord, jwtTokenUtils),
+                .addFilterBefore(new JwtTokenFilter(rsaKeyRecord, jwtTokenUtils),
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> {
                     ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());

@@ -1,4 +1,4 @@
-package com.logant.BookingSystem.Security.config.user;
+package com.logant.BookingSystem.Security.UserDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

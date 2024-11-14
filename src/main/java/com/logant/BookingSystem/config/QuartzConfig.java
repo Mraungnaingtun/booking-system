@@ -1,8 +1,10 @@
-package com.logant.BookingSystem.Quartz;
+package com.logant.BookingSystem.config;
 
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.logant.BookingSystem.Service.RefundCreditsJob;
 
 @Configuration
 public class QuartzConfig {

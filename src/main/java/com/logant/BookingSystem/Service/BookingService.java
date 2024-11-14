@@ -1,6 +1,8 @@
 package com.logant.BookingSystem.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.logant.BookingSystem.Entity.Booking;
@@ -44,73 +46,85 @@ public class BookingService {
         @Autowired
         PackageRepository packageRepository;
 
-        // --- book a class
+        @Autowired
+        private RedisTemplate<String, String> redisTemplate;
+
+        // ----------- book a class ----------
+
         public String bookClass(Long userId, Long classScheduleId) throws Exception {
-                // Fetch the class and user from the database
-                ClassSchedule classSchedule = classScheduleRepository.findById(classScheduleId)
-                                .orElseThrow(() -> new Exception("Class not found"));
+                ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+                String lockKey = "lock:classSchedule:" + classScheduleId;
+                String slotsKey = "slots:classSchedule:" + classScheduleId;
 
-                User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new Exception("User not found"));
+                // Acquire lock with a timeout of 5 seconds
+                Boolean lockAcquired = valueOps.setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
 
-                // Check if the user has already booked this class
-                if (bookingRepository.existsByUserAndClassSchedule(user, classSchedule)) {
-                        return "User have already booked this class.";
+                if (!Boolean.TRUE.equals(lockAcquired)) {
+                        return "Booking in progress. Please try again shortly.";
                 }
 
-                // Ensure that the user's package is in the same country
-                Country classCountry = classSchedule.getCountry();
-                UserPackage userPackage = userPackageRepository.findByUserIdAndPkg_Country(userId, classCountry)
-                                .orElseThrow(() -> new Exception(
-                                                "User does not have a valid package for this country"));
+                try {
+                        // Fetch the class and user from the database
+                        ClassSchedule classSchedule = classScheduleRepository.findById(classScheduleId)
+                                        .orElseThrow(() -> new Exception("Class not found"));
+                        User user = userRepository.findById(userId)
+                                        .orElseThrow(() -> new Exception("User not found"));
 
-                // Check if the user has enough credits in the package
-                if (userPackage.getCredits() < classSchedule.getRequiredCredits()) {
-                        throw new Exception("Not enough credits in the package");
-                }
+                                if (bookingRepository.existsByUserAndClassSchedule(user, classSchedule)) {
+                                return "User has already booked this class.";
+                        }
 
-                // Check if there are available slots
-                if (classSchedule.getAvailableSlots() > 0) {
-                        // Create a new booking
-                        Booking booking = new Booking();
-                        booking.setUser(user);
-                        booking.setClassSchedule(classSchedule);
-                        booking.setStatus(BookingStatus.BOOKED);
-                        booking.setCreditsUsed(classSchedule.getRequiredCredits());
-                        booking.setBookingDate(LocalDateTime.now());
-                        booking.setCheckedIn(false);
+                        // Load or initialize slots count in Redis
+                        String slotsValue = String.valueOf(valueOps.get(slotsKey));
+                        Integer availableSlots;
+                        if (slotsValue == null) {
+                                availableSlots = classSchedule.getAvailableSlots();
+                                valueOps.set(slotsKey, String.valueOf(availableSlots));
+                        } else {
+                                availableSlots = Integer.parseInt(slotsValue);
+                        }
 
-                        // Save the booking
-                        bookingRepository.save(booking);
+                        if (availableSlots > 0) {
+                                // Proceed with booking logic
+                                Booking booking = new Booking();
+                                booking.setUser(user);
+                                booking.setClassSchedule(classSchedule);
+                                booking.setStatus(BookingStatus.BOOKED);
+                                booking.setCreditsUsed(classSchedule.getRequiredCredits());
+                                booking.setBookingDate(LocalDateTime.now());
+                                booking.setCheckedIn(false);
 
-                        // Deduct credits from the user's package
-                        userPackage.setCredits(userPackage.getCredits() - classSchedule.getRequiredCredits());
-                        userPackageRepository.save(userPackage);
+                                bookingRepository.save(booking);
 
-                        // Decrement available slots for the class
-                        classSchedule.setAvailableSlots(classSchedule.getAvailableSlots() - 1);
-                        classScheduleRepository.save(classSchedule);
+                                // Deduct credits from the user's package
+                                UserPackage userPackage = userPackageRepository
+                                                .findByUserIdAndPkg_Country(userId, classSchedule.getCountry())
+                                                .orElseThrow(() -> new Exception(
+                                                                "User does not have a valid package for this country"));
+                                userPackage.setCredits(userPackage.getCredits() - classSchedule.getRequiredCredits());
+                                userPackageRepository.save(userPackage);
 
-                        return "Book Class Successfully";
-                } else {
-                        // Add user to the waitlist
-                        Waitlist waitlist = new Waitlist();
-                        waitlist.setUser(user);
-                        waitlist.setClassSchedule(classSchedule);
+                                availableSlots -= 1;
+                                valueOps.set(slotsKey, String.valueOf(availableSlots));
+                                classSchedule.setAvailableSlots(availableSlots);
+                                classScheduleRepository.save(classSchedule);
 
-                        // Set the waitlist position
-                        int waitlistPosition = waitlistRepository.countByClassSchedule(classSchedule) + 1;
-                        waitlist.setPosition(waitlistPosition);
-                        waitlist.setAddedDate(LocalDateTime.now());
+                                return "Book Class Successfully";
+                        } else {
+                                // ------ added to waitlist ------------
+                                Waitlist waitlist = new Waitlist();
+                                waitlist.setUser(user);
+                                waitlist.setClassSchedule(classSchedule);
+                                int waitlistPosition = waitlistRepository.countByClassSchedule(classSchedule) + 1;
+                                waitlist.setPosition(waitlistPosition);
+                                waitlist.setAddedDate(LocalDateTime.now());
+                                waitlistRepository.save(waitlist);
 
-                        // Save the waitlist entry
-                        waitlistRepository.save(waitlist);
-
-                        // Deduct credits from the user's package
-                        userPackage.setCredits(userPackage.getCredits() - classSchedule.getRequiredCredits());
-                        userPackageRepository.save(userPackage);
-
-                        return "Class is full. Added to the waitlist at position " + waitlistPosition;
+                                return "Class is full. Added to the waitlist at position " + waitlistPosition;
+                        }
+                } finally {
+                        // Release the Redis lock
+                        redisTemplate.delete(lockKey);
                 }
         }
 
