@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ public class UserController {
     private AuthService authService;
 
     // get user profile
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/{userId}")
     public ResponseEntity<?> getPackageById(@PathVariable Long userId) {
         try {
@@ -44,6 +46,7 @@ public class UserController {
     }
 
     // ----change password----
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto dto) {
         try {
@@ -57,6 +60,7 @@ public class UserController {
     }
 
     // --- reset password ---
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto dto) {
         try {

@@ -3,6 +3,7 @@ package com.logant.BookingSystem.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.logant.BookingSystem.Entity.Package;
 import com.logant.BookingSystem.Entity.UserPackage;
@@ -19,6 +20,7 @@ public class PackageController {
     private PackageService packageService;
 
     // --------- to fetch available packages -------------
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/available")
     public ResponseEntity<List<Package>> getAvailablePackages() {
         List<Package> availablePackages = packageService.getAvailablePackages();
@@ -26,6 +28,7 @@ public class PackageController {
     }
 
     // --------- buy a package -------------
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/buy/{userId}/{packageId}")
     public ResponseEntity<String> buyPackage(@PathVariable Long userId, @PathVariable Long packageId) {
         
@@ -41,6 +44,7 @@ public class PackageController {
     }
 
     //--- purchased packages ----------
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/user/{userId}/purchased")
     public ResponseEntity<List<Package>> getUserPurchasedPackages(@PathVariable Long userId) {
         List<Package> userPackages = packageService.getUserPurchasedPackages(userId);
@@ -51,6 +55,7 @@ public class PackageController {
     }
 
     // Get all packages
+    @PreAuthorize("hasAnyAuthority('SCOPE_WRITE')")
     @GetMapping
     public ResponseEntity<List<Package>> getAllPackages() {
         List<Package> packages = packageService.getAllPackages();
@@ -58,6 +63,7 @@ public class PackageController {
     }
 
     // Get package by ID
+    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/{packageId}")
     public ResponseEntity<Package> getPackageById(@PathVariable Long packageId) {
         Optional<Package> pkg = packageService.getPackageById(packageId);
@@ -65,6 +71,7 @@ public class PackageController {
     }
 
     // Create or update a package
+    @PreAuthorize("hasAnyAuthority('SCOPE_WRITE')")
     @PostMapping
     public ResponseEntity<Package> createPackage(@RequestBody Package pkg) {
         Package savedPackage = packageService.createPackage(pkg);
@@ -72,6 +79,7 @@ public class PackageController {
     }
 
     // Delete package by ID
+    @PreAuthorize("hasAnyAuthority('SCOPE_DELETE')")
     @DeleteMapping("/{packageId}")
     public ResponseEntity<Void> deletePackage(@PathVariable Long packageId) {
         packageService.deletePackage(packageId);

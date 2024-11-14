@@ -1,6 +1,5 @@
 package com.logant.BookingSystem.Security.Filters;
 
-
 import com.logant.BookingSystem.Security.Enum.TokenType;
 import com.logant.BookingSystem.Security.config.RSAKeyRecord;
 import com.logant.BookingSystem.Security.config.jwtAuth.JwtTokenUtils;
@@ -36,8 +35,8 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
     @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         try {
             log.info("[JwtAccessTokenFilter:doFilterInternal] :: Started ");
@@ -86,8 +85,7 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken createdToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
-                    );
+                            userDetails.getAuthorities());
                     createdToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -103,10 +101,12 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 
         } catch (JwtValidationException jwtValidationException) {
             if (jwtValidationException.getMessage().contains("Jwt expired")) {
-                log.error("[JwtAccessTokenFilter:doFilterInternal] Token expired: {}", jwtValidationException.getMessage());
+                log.error("[JwtAccessTokenFilter:doFilterInternal] Token expired: {}",
+                        jwtValidationException.getMessage());
                 setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is expired.");
             } else {
-                log.error("[JwtAccessTokenFilter:doFilterInternal] JWT Validation Exception: {}", jwtValidationException.getMessage());
+                log.error("[JwtAccessTokenFilter:doFilterInternal] JWT Validation Exception: {}",
+                        jwtValidationException.getMessage());
                 setErrorResponse(response, HttpStatus.BAD_REQUEST, "Invalid JWT token");
             }
         } catch (NullPointerException ex) {
@@ -114,7 +114,7 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
             setErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "A null pointer exception occurred.");
         } catch (Exception ex) {
             log.error("[JwtAccessTokenFilter:doFilterInternal] Exception: {}", ex.getMessage());
-            setErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while processing the token.");
+            setErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "Unauthorized!.");
         }
     }
 

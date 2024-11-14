@@ -76,7 +76,8 @@ public class PackageService {
     // Fetch all available packages that the user can buy
     public List<Package> getAvailablePackages() {
         List<Package> availablePackages = packageRepository.findAll().stream()
-                .filter(pkg -> isPackageAvailable(pkg)) // Filter packages that are available
+                .filter(pkg -> isPackageAvailable(pkg))
+                .peek(pkg -> pkg.setStatus("Available"))
                 .collect(Collectors.toList());
         return availablePackages;
     }

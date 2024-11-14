@@ -1,4 +1,4 @@
-package com.logant.BookingSystem.Controller;
+package com.logant.BookingSystem.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
