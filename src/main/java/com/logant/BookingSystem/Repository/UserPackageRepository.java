@@ -13,6 +13,7 @@ import com.logant.BookingSystem.Entity.UserPackage;
 @Repository
 public interface UserPackageRepository extends JpaRepository<UserPackage, Long> {
     List<UserPackage> findByUserId(Long userId);
+    UserPackage findByPkg(Package pkg);
     boolean existsByUserIdAndPkg_Id(Long userId, Long pkgId);
     Optional<UserPackage> findByUserIdAndPkg_Country(Long userId, Country pkgCountry);
 }

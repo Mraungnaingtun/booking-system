@@ -12,11 +12,15 @@ import com.logant.BookingSystem.Entity.Waitlist;
 import com.logant.BookingSystem.Enum.BookingStatus;
 import com.logant.BookingSystem.Repository.BookingRepository;
 import com.logant.BookingSystem.Repository.ClassScheduleRepository;
+import com.logant.BookingSystem.Repository.PackageRepository;
 import com.logant.BookingSystem.Repository.UserPackageRepository;
 import com.logant.BookingSystem.Repository.UserRepository;
 import com.logant.BookingSystem.Repository.WaitlistRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -36,6 +40,10 @@ public class BookingService {
         @Autowired
         private WaitlistRepository waitlistRepository;
 
+        @Autowired
+        PackageRepository packageRepository;
+
+        // --- book a class
         public String bookClass(Long userId, Long classScheduleId) throws Exception {
                 // Fetch the class and user from the database
                 ClassSchedule classSchedule = classScheduleRepository.findById(classScheduleId)
@@ -105,9 +113,7 @@ public class BookingService {
                 }
         }
 
-
-
-        // -----  to cancel booking and return credits to the package ------
+        // ----- to cancel booking and return credits to the user package ------
         public void cancelBooking(Long bookingId) throws Exception {
                 Booking booking = bookingRepository.findById(bookingId)
                                 .orElseThrow(() -> new Exception("Booking not found"));
@@ -159,4 +165,29 @@ public class BookingService {
                 bookingRepository.save(booking);
         }
 
+        // ----- get ended classes
+        public List<ClassSchedule> getEndedClasses() {
+                return classScheduleRepository.findByEndTimeBefore(LocalDateTime.now());
+        }
+
+        // ---- get waitlist users for a specific class
+        public List<Waitlist> getWaitlist(ClassSchedule classSchedule) {
+                return waitlistRepository.findByClassSchedule(classSchedule);
+        }
+
+        @Transactional
+        public void refundCreditsToWaitlistUser(Waitlist waitlistUser, ClassSchedule endedClass) throws Exception {
+                
+                User user = waitlistUser.getUser();
+                UserPackage userPackage = userPackageRepository
+                                .findByUserIdAndPkg_Country(user.getId(), endedClass.getCountry())
+                                .orElseThrow(() -> new Exception("User Purchased Package not found!"));
+
+                int creditsToRefund = endedClass.getRequiredCredits();
+                userPackage.setCredits(userPackage.getCredits() + creditsToRefund);
+                userPackageRepository.save(userPackage);
+                
+                //finally delete user from wait list
+                waitlistRepository.delete(waitlistUser);
+        }
 }

@@ -1,5 +1,7 @@
 package com.logant.BookingSystem.Repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +12,5 @@ import com.logant.BookingSystem.Entity.Waitlist;
 public interface WaitlistRepository extends JpaRepository<Waitlist, Long> {
     int countByClassSchedule(ClassSchedule classSchedule);
     Waitlist findFirstByClassScheduleOrderByPositionAsc(ClassSchedule classSchedule);
+    List<Waitlist> findByClassSchedule(ClassSchedule classSchedule);
 }
