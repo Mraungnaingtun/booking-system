@@ -5,6 +5,8 @@ import com.logant.BookingSystem.Dto.LoginRequestDto;
 import com.logant.BookingSystem.Dto.UserRegistrationDto;
 import com.logant.BookingSystem.Service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
+@Tag(name = "Authentication Module", description = "ROLE_ADMIN / ROLE_MANAGER / ROLE_USER")
 public class AuthController {
 
     @Autowired
@@ -30,8 +33,8 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // -------------------register---------------------------------------------
-    @PostMapping("/sign-up")
+    @Operation(summary = "Register New User", description = "You need to provide required data")
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto,
             BindingResult bindingResult, HttpServletResponse httpServletResponse) {
 
@@ -51,8 +54,10 @@ public class AuthController {
         }
     }
 
-    // -------------------login---------------------------------------------
-    @PostMapping("/sign-in")
+
+
+    @Operation(summary = "Login registered User", description = "You need to provide email and password")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequestDto,
             HttpServletResponse response) {
         try {

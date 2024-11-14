@@ -19,10 +19,13 @@ import com.logant.BookingSystem.Dto.ResetPasswordDto;
 import com.logant.BookingSystem.Service.AuthService;
 import com.logant.BookingSystem.Service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User Module", description = "Operations related to user management")
 public class UserController {
 
     @Autowired
@@ -31,7 +34,7 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
-    // get user profile
+    @Operation(summary = "User Profile", description = "Get User Profile")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/{userId}")
     public ResponseEntity<?> getPackageById(@PathVariable Long userId) {
@@ -45,7 +48,7 @@ public class UserController {
         }
     }
 
-    // ----change password----
+    @Operation(summary = "Change Password", description = "This endpoint is to change user password")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto dto) {
@@ -59,7 +62,7 @@ public class UserController {
         }
     }
 
-    // --- reset password ---
+    @Operation(summary = "Rest Password", description = "This endpoint is to reset Password")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto dto) {

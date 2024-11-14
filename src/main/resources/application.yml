@@ -32,6 +32,6 @@ jwt:
 
 
 
-# logging:
-#   level:
-#     org.springframework.security: TRACE
+logging:
+  level:
+    org.springframework.security: TRACE

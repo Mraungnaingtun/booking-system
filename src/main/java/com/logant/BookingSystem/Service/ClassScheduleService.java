@@ -2,7 +2,6 @@ package com.logant.BookingSystem.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ public class ClassScheduleService {
     @Autowired
     private ClassScheduleRepository classScheduleRepository;
 
-    // Create or Update a ClassSchedule
     @Transactional
     public ClassSchedule saveClassSchedule(ClassSchedule classSchedule) {
         classSchedule.setCreatedAt(LocalDateTime.now());
@@ -34,25 +32,5 @@ public class ClassScheduleService {
         return allClassSchedules.stream()
                 .filter(classSchedule -> classSchedule.getEndTime().isAfter(now))
                 .collect(Collectors.toList());
-    }
-
-    // Get a ClassSchedule by ID
-    public Optional<ClassSchedule> getClassScheduleById(Long classId) {
-        return classScheduleRepository.findById(classId);
-    }
-
-    // Delete a ClassSchedule by ID
-    public void deleteClassSchedule(Long classId) {
-        classScheduleRepository.deleteById(classId);
-    }
-
-    // Update a ClassSchedule
-    @Transactional
-    public ClassSchedule updateClassSchedule(Long classId, ClassSchedule updatedClassSchedule) {
-        if (classScheduleRepository.existsById(classId)) {
-            updatedClassSchedule.setId(classId);
-            return classScheduleRepository.save(updatedClassSchedule);
-        }
-        return null;
     }
 }

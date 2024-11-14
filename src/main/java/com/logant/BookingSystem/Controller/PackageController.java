@@ -9,17 +9,20 @@ import com.logant.BookingSystem.Entity.Package;
 import com.logant.BookingSystem.Entity.UserPackage;
 import com.logant.BookingSystem.Service.PackageService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/packages")
+@Tag(name = "Package Module", description = "Check Available Packages / Buy Package / See Own Packages")
 public class PackageController {
 
     @Autowired
     private PackageService packageService;
 
-    // --------- to fetch available packages -------------
+    @Operation(summary = "Get Available Packages", description = "To get all available packages")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/available")
     public ResponseEntity<List<Package>> getAvailablePackages() {
@@ -27,7 +30,7 @@ public class PackageController {
         return ResponseEntity.ok(availablePackages); // Return the list of available packages
     }
 
-    // --------- buy a package -------------
+    @Operation(summary = "Purchase New Package", description = "To purchase a new package with userid and package id")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/buy/{userId}/{packageId}")
     public ResponseEntity<String> buyPackage(@PathVariable Long userId, @PathVariable Long packageId) {
@@ -43,7 +46,8 @@ public class PackageController {
         }
     }
 
-    //--- purchased packages ----------
+
+    @Operation(summary = "Get User Own Package", description = "To get all packages with userid")
     @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/user/{userId}/purchased")
     public ResponseEntity<List<Package>> getUserPurchasedPackages(@PathVariable Long userId) {
@@ -54,35 +58,13 @@ public class PackageController {
         return ResponseEntity.ok(userPackages);
     }
 
-    // Get all packages
-    @PreAuthorize("hasAnyAuthority('SCOPE_WRITE')")
-    @GetMapping
-    public ResponseEntity<List<Package>> getAllPackages() {
-        List<Package> packages = packageService.getAllPackages();
-        return new ResponseEntity<>(packages, HttpStatus.OK);
-    }
 
-    // Get package by ID
-    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
-    @GetMapping("/{packageId}")
-    public ResponseEntity<Package> getPackageById(@PathVariable Long packageId) {
-        Optional<Package> pkg = packageService.getPackageById(packageId);
-        return pkg.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
-    // Create or update a package
+    @Operation(summary = "Create New Package(Admin)", description = "To create new pakage by a admin or manager")
     @PreAuthorize("hasAnyAuthority('SCOPE_WRITE')")
     @PostMapping
     public ResponseEntity<Package> createPackage(@RequestBody Package pkg) {
         Package savedPackage = packageService.createPackage(pkg);
         return new ResponseEntity<>(savedPackage, HttpStatus.CREATED);
-    }
-
-    // Delete package by ID
-    @PreAuthorize("hasAnyAuthority('SCOPE_DELETE')")
-    @DeleteMapping("/{packageId}")
-    public ResponseEntity<Void> deletePackage(@PathVariable Long packageId) {
-        packageService.deletePackage(packageId);
-        return ResponseEntity.noContent().build();
     }
 }
