@@ -5,9 +5,9 @@ spring:
     ansi:
       enabled: ALWAYS
   datasource:
-    url: jdbc:postgresql://localhost:5432/BookingSystem
-    username: postgres
-    password: 1qaz!QAZ
+    url: jdbc:postgresql://ep-shiny-credit-a59f8m6z.us-east-2.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: VQyHzsI5qbc4
     driver-class-name: org.postgresql.Driver
 
   data:
