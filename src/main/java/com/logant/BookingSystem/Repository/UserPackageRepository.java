@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.logant.BookingSystem.Entity.Country;
+import com.logant.BookingSystem.Entity.Package;
 import com.logant.BookingSystem.Entity.UserPackage;
 
 
@@ -16,4 +17,5 @@ public interface UserPackageRepository extends JpaRepository<UserPackage, Long> 
     UserPackage findByPkg(Package pkg);
     boolean existsByUserIdAndPkg_Id(Long userId, Long pkgId);
     Optional<UserPackage> findByUserIdAndPkg_Country(Long userId, Country pkgCountry);
+    UserPackage findByUserIdAndPkg_Id(Long userId, Long pkgId);
 }

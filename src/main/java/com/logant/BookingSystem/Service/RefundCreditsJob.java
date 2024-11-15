@@ -35,9 +35,9 @@ public class RefundCreditsJob implements Job {
             for (Waitlist waitlistUser : waitlistUsers) {
                 try {
                     bookingService.refundCreditsToWaitlistUser(waitlistUser, endedClass);
-                    log.info("Refunded credits to waitlist user: {}", waitlistUser.getUser().getUserName());
+                    log.info("Refunded credits to waitlist user: {}", waitlistUser.getUser().getUsername());
                 } catch (Exception e) {
-                    log.error("Error refunding credits for user: {}", waitlistUser.getUser().getUserName(), e);
+                    log.error("Error refunding credits for user: {}", waitlistUser.getUser().getUsername(), e);
                 }
             }
         }

@@ -1,16 +1,16 @@
 package com.logant.BookingSystem.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import com.logant.BookingSystem.Dto.ResponseWrapper;
 import com.logant.BookingSystem.Entity.Package;
-import com.logant.BookingSystem.Entity.UserPackage;
 import com.logant.BookingSystem.Service.PackageService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,48 +23,53 @@ public class PackageController {
     private PackageService packageService;
 
     @Operation(summary = "Get Available Packages", description = "To get all available packages")
-    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/available")
-    public ResponseEntity<List<Package>> getAvailablePackages() {
-        List<Package> availablePackages = packageService.getAvailablePackages();
-        return ResponseEntity.ok(availablePackages); // Return the list of available packages
+    public ResponseEntity<?> getAvailablePackages() {
+        try {
+            List<Package> availablePackages = packageService.getAvailablePackages();
+            return ResponseWrapper.success(availablePackages);
+        } catch (Exception e) {
+            return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
+
 
     @Operation(summary = "Purchase New Package", description = "To purchase a new package with userid and package id")
-    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @PostMapping("/buy/{userId}/{packageId}")
-    public ResponseEntity<String> buyPackage(@PathVariable Long userId, @PathVariable Long packageId) {
-        
+    public ResponseEntity<?> buyPackage(@PathVariable Long userId, @PathVariable Long packageId) {
         try {
-            UserPackage userPackage = packageService.buyPackage(userId, packageId);
-            return ResponseEntity.ok("Package purchased successfully! Package ID: " + userPackage.getUserPackageId());
+
+            return ResponseWrapper.success(packageService.buyPackage(userId, packageId));
 
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+            return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            
+            return ResponseWrapper.error(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
-
 
     @Operation(summary = "Get User Own Package", description = "To get all packages with userid")
-    @PreAuthorize("hasAnyAuthority('SCOPE_READ')")
     @GetMapping("/user/{userId}/purchased")
-    public ResponseEntity<List<Package>> getUserPurchasedPackages(@PathVariable Long userId) {
-        List<Package> userPackages = packageService.getUserPurchasedPackages(userId);
-        if (userPackages.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> getUserPurchasedPackages(@PathVariable Long userId) {
+        try {
+            List<Package> userPackages = packageService.getUserPurchasedPackages(userId);
+            return ResponseWrapper.success(userPackages);
+        } catch (Exception e) {
+            return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-        return ResponseEntity.ok(userPackages);
     }
 
-
-
-    @Operation(summary = "Create New Package(Admin)", description = "To create new pakage by a admin or manager")
-    @PreAuthorize("hasAnyAuthority('SCOPE_WRITE')")
+    @Operation(summary = "Create New Package(Admin)", description = "To create new package by an admin or manager")
     @PostMapping
-    public ResponseEntity<Package> createPackage(@RequestBody Package pkg) {
-        Package savedPackage = packageService.createPackage(pkg);
-        return new ResponseEntity<>(savedPackage, HttpStatus.CREATED);
+    public ResponseEntity<?> createPackage(@RequestBody Package pkg) {
+        try {
+            Package savedPackage = packageService.createPackage(pkg);
+            return ResponseWrapper.success(savedPackage);
+        } catch (Exception e) {
+            return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

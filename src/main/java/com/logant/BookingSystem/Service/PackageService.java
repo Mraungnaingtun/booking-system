@@ -83,7 +83,7 @@ public class PackageService {
     }
 
     @Transactional
-    public UserPackage buyPackage(Long userId, Long packageId) {
+    public String buyPackage(Long userId, Long packageId) {
         // Fetch the package and user from the database
         Optional<Package> optionalPackage = packageRepository.findById(packageId);
         Optional<User> optionalUser = userRepository.findById(userId);
@@ -93,9 +93,15 @@ public class PackageService {
             User user = optionalUser.get();
 
             // Check if the user already has this package
-            boolean isPackageAlreadyPurchased = userPackageRepository.existsByUserIdAndPkg_Id(userId, packageId);
-            if (isPackageAlreadyPurchased) {
-                throw new IllegalStateException("User has already purchased this package.");
+            boolean isAlreadyPurchased = userPackageRepository.existsByUserIdAndPkg_Id(userId, packageId);
+                if (isAlreadyPurchased) {
+                UserPackage userPackage = userPackageRepository.findByUserIdAndPkg_Id(userId, packageId);
+                // add credit
+                userPackage.setCredits(userPackage.getCredits() + pkg.getCredits());
+
+                userPackageRepository.save(userPackage);
+
+                return "Update Packge's Credit in Package ID: " + userPackage.getUserPackageId();
             }
 
             // Check if package is available for purchase
@@ -110,8 +116,8 @@ public class PackageService {
             userPackage.setCredits(pkg.getCredits());
             userPackage.setExpirationDate(pkg.getCreatedAt().toLocalDate().plusDays(pkg.getValidityDays()));
             userPackage.setPurchaseDate(LocalDateTime.now());
-
-            return userPackageRepository.save(userPackage);
+            userPackageRepository.save(userPackage);
+            return "Package ID :" + userPackage.getUserPackageId() + " was purchased successfully!";
         } else {
             throw new IllegalArgumentException("User or Package not found.");
         }
@@ -122,20 +128,23 @@ public class PackageService {
         return packageRepository.findById(packageId);
     }
 
-    public Package createPackage(Package pkg) {
+    public Package createPackage(Package pkg) throws Exception {
         // Get the Country from the Package
         Country country = pkg.getCountry();
 
-        // Check if the Country exists in the database by its ID
         if (country.getCountryId() == null || !countryRepository.existsById(country.getCountryId())) {
             // Throw an exception or return an error message if the country doesn't exist
             throw new IllegalArgumentException("Country with ID " + country.getCountryId() + " does not exist.");
         }
 
-        // The Country exists, so proceed with saving the Package
-        pkg.setCountry(country);  // Ensure the country is properly set before saving the package
+        Package existPackage = packageRepository.findByCountry(country);
+        if(existPackage != null){
+            throw new Exception("A Package is Alreay exist for this Country!");
+        }
 
-        return packageRepository.save(pkg);  // Save the package
+        pkg.setCountry(country); 
+
+        return packageRepository.save(pkg);
     }
 
     // Delete package by ID

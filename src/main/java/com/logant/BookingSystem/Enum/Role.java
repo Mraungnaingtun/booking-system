@@ -1,6 +1,6 @@
 package com.logant.BookingSystem.Enum;
 
-
-public enum TokenType {
-    Bearer
+public enum Role {
+    USER,
+    ADMIN
 }

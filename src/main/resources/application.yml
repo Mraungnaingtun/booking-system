@@ -5,33 +5,32 @@ spring:
     ansi:
       enabled: ALWAYS
   datasource:
-    url: jdbc:postgresql://ep-shiny-credit-a59f8m6z.us-east-2.aws.neon.tech/neondb?sslmode=require
+    url: jdbc:postgresql://ep-green-hill-a53zc562.us-east-2.aws.neon.tech/neondb?sslmode=require
     username: neondb_owner
-    password: VQyHzsI5qbc4
+    password: mSHPCuI6j5cR
     driver-class-name: org.postgresql.Driver
-
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 10
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
   data:
     redis:
       host: localhost
       port: 6379
       timeout: 6000
-    
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
 
 server:
   port: 8099
 
 jwt:
-  rsa-private-key: classpath:certs/privateKey.pem
-  rsa-public-key: classpath:certs/publicKey.pem
-  access-token:
-    expiration: 60
+  secret-key: "9A4C3E7D82467F10B8C1A3E1F3D8BCE3A0F2E9D234F7B2C8F21D90B8F9A4A92F"
+  expiration: 60
 
 
 
-logging:
-  level:
-    org.springframework.security: TRACE
+# logging:
+#   level:
+#     org.springframework.security: TRACE
