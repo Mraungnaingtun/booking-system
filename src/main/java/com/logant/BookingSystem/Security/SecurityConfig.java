@@ -70,8 +70,8 @@ public class SecurityConfig {
         System.out.println("Configuring public endpoints filter chain for /sign-up/**");
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher(new AntPathRequestMatcher("/sign-in/**"))
-                .securityMatcher(new AntPathRequestMatcher("/sign-up/**"))
+                .securityMatcher(new AntPathRequestMatcher("/login/**"))
+                .securityMatcher(new AntPathRequestMatcher("/register/**"))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
