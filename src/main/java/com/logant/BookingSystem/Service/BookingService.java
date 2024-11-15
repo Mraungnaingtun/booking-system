@@ -77,7 +77,7 @@ public class BookingService {
                         // Load or initialize slots count in Redis
                         String slotsValue = String.valueOf(valueOps.get(slotsKey));
                         Integer availableSlots;
-                        if (slotsValue == null) {
+                        if (slotsValue == null || slotsValue.equals("null")) {
                                 availableSlots = classSchedule.getAvailableSlots();
                                 valueOps.set(slotsKey, String.valueOf(availableSlots));
                         } else {
