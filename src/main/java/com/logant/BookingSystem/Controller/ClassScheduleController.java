@@ -61,12 +61,12 @@ public class ClassScheduleController {
 
 
 
-    @Operation(summary = "Create New Class(ADMIN)", description = "To create a new class schedule by Admin or Manger")
-    @PostMapping
-    public ResponseEntity<ClassSchedule> createClassSchedule(@RequestBody ClassSchedule classSchedule) {
-        ClassSchedule savedClassSchedule = classScheduleService.saveClassSchedule(classSchedule);
-        return new ResponseEntity<>(savedClassSchedule, HttpStatus.CREATED);
-    }
+    // @Operation(summary = "Create New Class", description = "To create a new class schedule by Admin or Manger")
+    // @PostMapping
+    // public ResponseEntity<ClassSchedule> createClassSchedule(@RequestBody ClassSchedule classSchedule) {
+    //     ClassSchedule savedClassSchedule = classScheduleService.saveClassSchedule(classSchedule);
+    //     return new ResponseEntity<>(savedClassSchedule, HttpStatus.CREATED);
+    // }
 
 
 }

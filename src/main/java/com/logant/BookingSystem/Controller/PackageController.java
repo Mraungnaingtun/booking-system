@@ -62,14 +62,14 @@ public class PackageController {
         }
     }
 
-    @Operation(summary = "Create New Package(Admin)", description = "To create new package by an admin or manager")
-    @PostMapping
-    public ResponseEntity<?> createPackage(@RequestBody Package pkg) {
-        try {
-            Package savedPackage = packageService.createPackage(pkg);
-            return ResponseWrapper.success(savedPackage);
-        } catch (Exception e) {
-            return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
+    // @Operation(summary = "Create New Package(Admin)", description = "To create new package by an admin or manager")
+    // @PostMapping
+    // public ResponseEntity<?> createPackage(@RequestBody Package pkg) {
+    //     try {
+    //         Package savedPackage = packageService.createPackage(pkg);
+    //         return ResponseWrapper.success(savedPackage);
+    //     } catch (Exception e) {
+    //         return ResponseWrapper.error(HttpStatus.BAD_REQUEST, e.getMessage());
+    //     }
+    // }
 }
